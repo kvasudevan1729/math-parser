@@ -2,16 +2,19 @@
 
 use crate::lex::LexToken;
 
+#[derive(Debug, PartialEq)]
 pub enum CfgTerm {
     NonTerm_Expr,
     NonTerm_MultiExpr,
     NonTerm_Term,
     TermNumber(u32),
     TermPlus,
+    TermMinus,
     TermLeftParens,
     TermRightParens,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct ParseNode {
     current_node: CfgTerm,
     child_nodes: Vec<ParseNode>,
@@ -37,18 +40,21 @@ fn parse_expr(tokens: &Vec<LexToken>, pos: usize) -> Result<(ParseNode, usize), 
     let mut expr_node = ParseNode::new(CfgTerm::NonTerm_Expr);
     expr_node.add_child_node(multi_expr_node);
 
-    // possible that we have reached EOF
+    // check if we have reached EOF
     if (new_pos + 1) >= tokens.len() {
         return Ok((expr_node, new_pos));
     }
 
     // look for +
-    println!("=> looking for + ... {new_pos}");
+    println!("=> looking for +/- ... {new_pos}");
     let tok = tokens.get(new_pos + 1);
     println!("=> tok: {:?}", tok);
     match tok {
         Some(LexToken::Add(_)) => {
             expr_node.add_child_node(ParseNode::new(CfgTerm::TermPlus));
+        }
+        Some(LexToken::Subtract(_)) => {
+            expr_node.add_child_node(ParseNode::new(CfgTerm::TermMinus));
         }
         _ => {
             return Err(format!("Expected plus sign!"));
@@ -113,4 +119,21 @@ fn parse_term(tokens: &Vec<LexToken>, pos: usize) -> Result<(ParseNode, usize), 
 pub(crate) fn parse(tokens: Vec<LexToken>) -> Result<(ParseNode, usize), String> {
     // start off with Expr
     return parse_expr(&tokens, 0);
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::cfg;
+    use crate::cfg::CfgTerm;
+    use crate::lex;
+
+    #[test]
+    fn test_parse_add_expr() {
+        let s = "2 + 3";
+        let lex_tokens = lex::lexer(s).expect("Failed to tokenize the string!");
+        let (parsed_node, _) = cfg::parse(lex_tokens).expect("parsing failed!");
+        println!("parsed node: {:?}", parsed_node);
+        assert_eq!(parsed_node.current_node, CfgTerm::NonTerm_Expr);
+        assert_eq!(parsed_node.child_nodes.len(), 3);
+    }
 }
