@@ -4,8 +4,9 @@ use std::io::{self, Write};
 
 // grammar rules
 // start_rule: expr
-// expr: multi_expr + expr | multi_expr '-' expr
-// multi_expr: term * multi_expr | term
+// expr: multi_div_expr + expr | multi_div_expr '-' expr
+// multi_div_expr: div_expr * multi_div_expr | div_expr
+// div_expr: term / div_expr | term
 // term: NUMBER | ( expr )
 
 fn main() -> io::Result<()> {
@@ -21,7 +22,9 @@ fn main() -> io::Result<()> {
         Ok(parse_tree) => {
             println!("parse tree: {}", parse_tree);
         }
-        Err(cfg::ParseError::EndOfTokenError) => {}
+        Err(cfg::ParseError::EndOfTokenError) => {
+            println!("End Of Tokens, parsed successfully!")
+        }
         _ => {
             println!("Unknown error occurred!")
         }
