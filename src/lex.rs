@@ -53,7 +53,7 @@ pub(crate) fn lexer(s: &str) -> Result<Vec<LexToken>, String> {
                 tok_list.next();
             }
             '-' => {
-                println!("minux: {}", c);
+                println!("minus: {}", c);
                 tokens.push(LexToken::Subtract(c));
                 tok_list.next();
             }
