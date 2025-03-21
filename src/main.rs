@@ -2,6 +2,8 @@ mod cfg;
 mod lex;
 use std::io::{self, Write};
 
+use cfg::mathparser::MathParser;
+
 // grammar rules
 // start_rule: expr
 // expr: multi_div_expr + expr | multi_div_expr '-' expr
@@ -15,15 +17,11 @@ fn main() -> io::Result<()> {
     io::stdout().flush()?;
     io::stdin().read_line(&mut s)?;
     println!("=> parsing expression: {s}");
-    println!("=> run lexer ...");
-    let lex_tokens = lex::lexer(s.trim()).expect("Failed to tokenize the string!");
-    println!("lex tokens: {:?}", lex_tokens);
-    match cfg::parse(lex_tokens) {
-        Ok(parse_tree) => {
-            println!("parse tree: {}", parse_tree);
-        }
-        Err(cfg::ParseError::EndOfTokenError) => {
-            println!("End Of Tokens, parsed successfully!")
+    let mut math_parser = MathParser::new(String::from(s));
+    let _ = math_parser.start();
+    match math_parser.parsed_node {
+        Some(parse_node) => {
+            println!("\nparse node: {}", parse_node);
         }
         _ => {
             println!("Unknown error occurred!")
