@@ -66,13 +66,15 @@ impl fmt::Display for CfgTerm {
 pub struct ParseNode {
     current_node: CfgTerm,
     child_nodes: Vec<ParseNode>,
+    node_depth: usize,
 }
 
 impl ParseNode {
-    pub fn new(current_node: CfgTerm) -> ParseNode {
+    pub fn new(current_node: CfgTerm, node_depth: usize) -> ParseNode {
         ParseNode {
             current_node,
             child_nodes: Vec::new(),
+            node_depth,
         }
     }
 
@@ -83,13 +85,17 @@ impl ParseNode {
 
 impl fmt::Display for ParseNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut space: String = " ".to_owned();
         let mut s: String = " ".to_owned();
-        for (i, n) in self.child_nodes.iter().enumerate() {
-            s.push_str(&format!("*{}* {}", i, n.to_string()));
+        for (_, n) in self.child_nodes.iter().enumerate() {
+            s.push_str(&format!("\n{}", n.to_string()));
+        }
+        for _ in 0..self.node_depth {
+            space.push_str(" ");
         }
         write!(
             f,
-            "[{}](child nodes: {}) -- {s}",
+            "{space}+[{}](child count={}){s}",
             self.current_node,
             self.child_nodes.len()
         )

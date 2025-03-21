@@ -21,7 +21,7 @@ fn main() -> io::Result<()> {
     let _ = math_parser.start();
     match math_parser.parsed_node {
         Some(parse_node) => {
-            println!("\nparse node: {}", parse_node);
+            println!("\nparse node:\n\n{}", parse_node);
         }
         _ => {
             println!("Unknown error occurred!")
