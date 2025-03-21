@@ -6,7 +6,7 @@ use cfg::mathparser::MathParser;
 
 // grammar rules
 // start_rule: expr
-// expr: multi_div_expr + expr | multi_div_expr '-' expr
+// expr: multi_div_expr + expr | multi_div_expr '-' expr | multi_div_expr
 // multi_div_expr: div_expr * multi_div_expr | div_expr
 // div_expr: term / div_expr | term
 // term: NUMBER | ( expr )

@@ -45,20 +45,23 @@ impl MathParser {
                 let mut term_node = ParseNode::new(CfgTerm::NonTermTermExpr, node_depth);
 
                 println!("(");
-                let left_parens_node = ParseNode::new(CfgTerm::TermLeftParens, node_depth);
+                let left_parens_node = ParseNode::new(CfgTerm::TermLeftParens, node_depth + 1);
                 term_node.child_nodes.push(left_parens_node);
                 let (expr_node, expr_pos) = self.parse_expr(pos + 1, node_depth + 1)?;
                 term_node.child_nodes.push(expr_node);
+                println!("term_node: {}, expr_pos: {}", term_node, expr_pos);
 
                 // close parens
                 // let close_parens_tok = tokens.get(expr_pos + 1).expect("Expected close parens");
-                let close_parens_tok = self.peek(expr_pos + 1);
+                let close_parens_tok = self.peek(expr_pos);
+                println!("close_parens_tok: {:?}", close_parens_tok);
                 assert_eq!(*(close_parens_tok.unwrap()), LexToken::RightParen(')'));
 
-                let right_parens_node = ParseNode::new(CfgTerm::TermRightParens, node_depth);
+                let right_parens_node = ParseNode::new(CfgTerm::TermRightParens, node_depth + 1);
                 term_node.child_nodes.push(right_parens_node);
+                println!("term_node: {}, expr_pos+2: {}", term_node, expr_pos + 1);
 
-                return Ok((term_node, expr_pos + 2));
+                return Ok((term_node, expr_pos + 1));
             }
             Some(LexToken::Num(n)) => {
                 println!("term num: {}", *n);
@@ -110,8 +113,12 @@ impl MathParser {
                 println!("=> [div_expr] found * , next_pos: {}", new_pos + 1);
                 return Ok((dive_node, new_pos));
             }
+            Some(LexToken::RightParen(_)) => {
+                println!("=> [div_expr] right parens");
+                return Ok((dive_node, new_pos));
+            }
             None => {
-                println!("=> [multi_div_expr] End of token stream!");
+                println!("=> [div_expr] End of token stream!");
                 return Ok((dive_node, new_pos));
             }
             _ => {
@@ -162,6 +169,10 @@ impl MathParser {
                 let pt_node = ParseNode::new(CfgTerm::TermNumber(*n), node_depth);
                 mde_node.add_child_node(pt_node);
                 return Ok((mde_node, new_pos + 1));
+            }
+            Some(LexToken::RightParen(_)) => {
+                println!("=> [multi_div_expr] right parens");
+                return Ok((mde_node, new_pos));
             }
             None => {
                 println!("=> [multi_div_expr] End of token stream!");
@@ -215,6 +226,10 @@ impl MathParser {
             //         self.parse_expr(new_pos + 1, node_depth + 1)?;
             //     return Ok((tail_expr_node, tail_expr_pos));
             // }
+            Some(LexToken::RightParen(_)) => {
+                println!("=> [expr] right parens");
+                return Ok((expr_node, new_pos));
+            }
             None => {
                 println!("=> [parse_expr] End of token stream!");
                 return Ok((expr_node, new_pos));
