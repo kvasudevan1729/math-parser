@@ -12,19 +12,6 @@ use lex::lex_multi_digit;
 // div_expr: term / div_expr | term
 // term: NUMBER | ( expr )
 
-fn test_lexer(s: &str) {
-    println!("=> parsing math expression: {s}");
-    match lex_multi_digit::lexer(s) {
-        Ok(my_lexer) => {
-            println!("tokens: {:?}", my_lexer.get_tokens());
-        }
-        Err(e) => {
-            println!("Error: {e}");
-            panic!("Lexer failed to tokenise the string!");
-        }
-    }
-}
-
 fn main() -> io::Result<()> {
     let mut s = String::new();
     print!("Enter math expression to parse:\n>>");
@@ -32,15 +19,12 @@ fn main() -> io::Result<()> {
     io::stdin().read_line(&mut s)?;
     // test_lexer(&s);
 
-    let mut math_parser = MathParser::new(s);
-    match math_parser.set_lexer() {
-        Ok(()) => {}
-        Err(e) => {
-            println!("Error: {e}");
-            panic!("Lexer failed to tokenise the string!");
-        }
-    }
-    let _ = math_parser.start();
+    let _lexer =
+        lex_multi_digit::lexer(s.as_str()).expect("Failed to create a lexer with input {s}");
+    let lex_tokens = _lexer.get_tokens();
+    println!("lex tokens: {:?}", lex_tokens);
+    let mut math_parser = MathParser::new(lex_tokens);
+    let _ = math_parser.parse();
     match math_parser.parsed_node {
         Some(parse_node) => {
             println!("\nparse node:\n\n{}", parse_node);

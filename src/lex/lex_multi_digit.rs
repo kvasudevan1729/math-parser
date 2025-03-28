@@ -69,7 +69,8 @@ impl Lexer {
                         let (n, pos) = self.get_number(next_pos)?;
                         println!("n: {n}");
                         self.tokens.push(n);
-                        next_pos = pos + 1;
+                        // get_number fn already has moved the pointer
+                        next_pos = pos;
                         println!("next_pos: {next_pos}");
                     }
                     '+' => {

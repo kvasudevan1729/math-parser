@@ -1,8 +1,4 @@
-use crate::{
-    cfg::CfgTerm,
-    cfg::ParseError,
-    lex::{lex_multi_digit::lexer, lex_multi_digit::Lexer, simple::LexToken},
-};
+use crate::{cfg::CfgTerm, cfg::ParseError, lex::simple::LexToken};
 
 use std::error::Error;
 
@@ -10,37 +6,25 @@ use super::ParseNode;
 
 #[derive(Default)]
 pub(crate) struct MathParser<'a> {
-    s: String,
-    math_lexer: Option<Lexer>,
     lex_tokens: &'a [LexToken],
     pub(crate) parsed_node: Option<ParseNode>,
 }
 
 impl<'a> MathParser<'a> {
-    pub(crate) fn new(s: String) -> Self {
+    pub(crate) fn new(lex_tokens: &'a [LexToken]) -> Self {
         MathParser {
-            s,
+            lex_tokens,
             ..Default::default()
         }
-    }
-
-    pub(crate) fn set_lexer(&mut self) -> Result<(), Box<dyn Error>> {
-        let _lexer = lexer(self.s.as_str())?;
-        println!("tokens: {:?}", self.lex_tokens);
-        self.math_lexer = Some(_lexer);
-
-        Ok(())
     }
 
     /// check if we have reached EOF by inspecting the current position with the
     /// number of tokens
     fn peek(&self, pos: usize) -> Option<&LexToken> {
-        let _lexer = self.math_lexer.as_ref().unwrap();
-        let lex_tokens = _lexer.get_tokens();
-        if (pos + 1) >= lex_tokens.len() {
+        if (pos + 1) >= self.lex_tokens.len() {
             return None;
         }
-        let tok = lex_tokens.get(pos + 1);
+        let tok = self.lex_tokens.get(pos + 1);
         println!("=> [peek] tok: {:?} pos: [{}]", tok, pos + 1);
         return tok;
     }
@@ -52,9 +36,7 @@ impl<'a> MathParser<'a> {
         node_depth: usize,
     ) -> Result<(ParseNode, usize), ParseError> {
         println!("=> [{node_depth}]parsing term node at position {pos} ...");
-        let _lexer = self.math_lexer.as_ref().unwrap();
-        let lex_tokens = _lexer.get_tokens();
-        let tok = lex_tokens.get(pos);
+        let tok = self.lex_tokens.get(pos);
         match tok {
             Some(LexToken::LeftParen('(')) => {
                 let mut term_node = ParseNode::new(CfgTerm::NonTermTermExpr, node_depth);
@@ -274,7 +256,7 @@ impl<'a> MathParser<'a> {
         Ok(())
     }
 
-    pub(crate) fn start(&mut self) -> Result<(), Box<dyn Error>> {
+    pub(crate) fn parse(&mut self) -> Result<(), Box<dyn Error>> {
         let _ = self.start_rule();
 
         Ok(())
