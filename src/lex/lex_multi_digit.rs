@@ -117,3 +117,42 @@ pub(crate) fn lexer(s: &str) -> Result<Lexer, Box<dyn error::Error>> {
 
     return Ok(my_lexer);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_lexer_add_expr() {
+        let s = "12+34";
+        let my_lex = lexer(s).unwrap();
+        let tokens = my_lex.get_tokens();
+        assert_eq!(tokens[0], LexToken::Num(12));
+        assert_eq!(tokens[1], LexToken::Add('+'));
+        assert_eq!(tokens[2], LexToken::Num(34));
+    }
+
+    #[test]
+    fn test_lexer_subtract_expr() {
+        let s = "12 -345";
+        let my_lex = lexer(s).unwrap();
+        let tokens = my_lex.get_tokens();
+        assert_eq!(tokens[0], LexToken::Num(12));
+        assert_eq!(tokens[1], LexToken::Subtract('-'));
+        assert_eq!(tokens[2], LexToken::Num(345));
+    }
+
+    #[test]
+    fn test_lexer_multi_op_expr() {
+        let s = "12 -345* 555 / 678 ";
+        let my_lex = lexer(s).unwrap();
+        let tokens = my_lex.get_tokens();
+        assert_eq!(tokens[0], LexToken::Num(12));
+        assert_eq!(tokens[1], LexToken::Subtract('-'));
+        assert_eq!(tokens[2], LexToken::Num(345));
+        assert_eq!(tokens[3], LexToken::Multi('*'));
+        assert_eq!(tokens[4], LexToken::Num(555));
+        assert_eq!(tokens[5], LexToken::Div('/'));
+        assert_eq!(tokens[6], LexToken::Num(678));
+    }
+}
