@@ -242,7 +242,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_parens_and_add_expr() {
         let s = "(2 / 3) + 4";
         let my_lex = lexer(s).unwrap();
@@ -264,7 +263,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_parens_and_div_expr() {
         let s = "(2 / 3) / 4";
         let my_lex = lexer(s).unwrap();
@@ -399,7 +397,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_parens_and_multiply_expr() {
         let s = "(2 / 3) * 4";
         let my_lex = lexer(s).unwrap();
@@ -421,7 +418,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_parens_and_parens_expr() {
         let s = "(2 / 3) / ( 3 / 4)";
         let my_lex = lexer(s).unwrap();

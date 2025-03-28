@@ -17,7 +17,6 @@ fn main() -> io::Result<()> {
     print!("Enter math expression to parse:\n>>");
     io::stdout().flush()?;
     io::stdin().read_line(&mut s)?;
-    // test_lexer(&s);
 
     let _lexer =
         lex_multi_digit::lexer(s.as_str()).expect("Failed to create a lexer with input {s}");

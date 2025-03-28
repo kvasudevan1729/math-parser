@@ -89,6 +89,14 @@ impl Lexer {
                         self.tokens.push(LexToken::Div('/'));
                         next_pos += 1;
                     }
+                    '(' => {
+                        self.tokens.push(LexToken::LeftParen('('));
+                        next_pos += 1;
+                    }
+                    ')' => {
+                        self.tokens.push(LexToken::RightParen(')'));
+                        next_pos += 1;
+                    }
                     c if c.is_whitespace() => {
                         println!("whitespace -- ignore");
                         next_pos += 1;
@@ -124,35 +132,41 @@ mod tests {
 
     #[test]
     fn test_lexer_add_expr() {
-        let s = "12+34";
+        let s = "(12+34)";
         let my_lex = lexer(s).unwrap();
         let tokens = my_lex.get_tokens();
-        assert_eq!(tokens[0], LexToken::Num(12));
-        assert_eq!(tokens[1], LexToken::Add('+'));
-        assert_eq!(tokens[2], LexToken::Num(34));
+        assert_eq!(tokens[0], LexToken::LeftParen('('));
+        assert_eq!(tokens[1], LexToken::Num(12));
+        assert_eq!(tokens[2], LexToken::Add('+'));
+        assert_eq!(tokens[3], LexToken::Num(34));
+        assert_eq!(tokens[4], LexToken::RightParen(')'));
     }
 
     #[test]
     fn test_lexer_subtract_expr() {
-        let s = "12 -345";
+        let s = "(12 -345)";
         let my_lex = lexer(s).unwrap();
         let tokens = my_lex.get_tokens();
-        assert_eq!(tokens[0], LexToken::Num(12));
-        assert_eq!(tokens[1], LexToken::Subtract('-'));
-        assert_eq!(tokens[2], LexToken::Num(345));
+        assert_eq!(tokens[0], LexToken::LeftParen('('));
+        assert_eq!(tokens[1], LexToken::Num(12));
+        assert_eq!(tokens[2], LexToken::Subtract('-'));
+        assert_eq!(tokens[3], LexToken::Num(345));
+        assert_eq!(tokens[4], LexToken::RightParen(')'));
     }
 
     #[test]
     fn test_lexer_multi_op_expr() {
-        let s = "12 -345* 555 / 678 ";
+        let s = "12 -345* (555 / 678) ";
         let my_lex = lexer(s).unwrap();
         let tokens = my_lex.get_tokens();
         assert_eq!(tokens[0], LexToken::Num(12));
         assert_eq!(tokens[1], LexToken::Subtract('-'));
         assert_eq!(tokens[2], LexToken::Num(345));
         assert_eq!(tokens[3], LexToken::Multi('*'));
-        assert_eq!(tokens[4], LexToken::Num(555));
-        assert_eq!(tokens[5], LexToken::Div('/'));
-        assert_eq!(tokens[6], LexToken::Num(678));
+        assert_eq!(tokens[4], LexToken::LeftParen('('));
+        assert_eq!(tokens[5], LexToken::Num(555));
+        assert_eq!(tokens[6], LexToken::Div('/'));
+        assert_eq!(tokens[7], LexToken::Num(678));
+        assert_eq!(tokens[8], LexToken::RightParen(')'));
     }
 }
